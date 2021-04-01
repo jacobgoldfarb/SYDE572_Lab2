@@ -11,7 +11,12 @@ MAP3(al', bl', cl',...
 scatter(al(:,1), al(:,2), 'x')
 scatter(bl(:,1), bl(:,2), '*')
 scatter(cl(:,1), cl(:,2))
+legend('Class A', 'Class B', 'Class C',  'AutoUpdate', 'off')
 
 % Part 2
 Parzen2D()
-
+hold on;
+scatter(al(:,1), al(:,2), 'x')
+scatter(bl(:,1), bl(:,2), '*')
+scatter(cl(:,1), cl(:,2))
+legend('Class A', 'Class B', 'Class C',  'AutoUpdate', 'off')

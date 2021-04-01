@@ -8,54 +8,55 @@ function Parzen2D
     var = 400;
     Sigma = [var 0; 0 var];
     
-    X = [al(:,1)' bl(:,1)' cl(:,1)'];
-    Y = [al(:,2)' bl(:,2)' cl(:,2)'];
-    minVal = min(min(X), min(Y));
-    maxVal = max(max(X), max(Y));
+    [finalOutputA, xA, yA] = parzen(al, 0.5, 400);
+    [finalOutputB, xB, yB] = parzen(bl, 0.5, 400);
+    [finalOutputC , xC, yC] = parzen(cl, 0.5, 400);
     
-    finalOutputA = zeros(maxVal, maxVal);
-    finalOutputB = zeros(maxVal, maxVal);
-    finalOutputC = zeros(maxVal, maxVal);
 
-    pairs = nchoosek(minVal:1:maxVal, 2);
-    pairs = [pairs; pairs(:,2) pairs(:,1); [minVal:1:maxVal; minVal:1:maxVal]'];
-    outputA = zeros(1, length(pairs));
-    outputB = zeros(1, length(pairs));
-    outputC = zeros(1, length(pairs));
-    
-    for i = 1:100
-        i/100 %loading percentage
-        outA = mvnpdf(pairs, al(i), Sigma)';
-        outB = mvnpdf(pairs, bl(i), Sigma)';
-        outC = mvnpdf(pairs, cl(i), Sigma)';
-        outputA = outputA + outA;
-        outputB = outputB + outB;
-        outputC = outputC + outC;
-    end
-    
-    for i = 1:length(pairs)
-        i/length(pairs) %loading percentage
-        finalOutputA(pairs(i, 1), pairs(i, 2)) = outputA(i);
-        finalOutputB(pairs(i, 1), pairs(i, 2)) = outputB(i);
-        finalOutputC(pairs(i, 1), pairs(i, 2)) = outputC(i);
-    end
     figure
     hold on;    
-    surf(finalOutputA, 'FaceColor', 'blue');
+    surf(xA, yA, finalOutputA,'FaceColor', 'blue');
     alpha(0.4)
-    surf(finalOutputB, 'FaceColor', 'yellow');
+    surf(xB, yB, finalOutputB, 'FaceColor', 'yellow');
     alpha(0.4)
-    surf(finalOutputC, 'FaceColor', 'green');
+    surf(xC, yC, finalOutputC, 'FaceColor', 'green');
     alpha(0.4)
+    figure
+
+    domainLength = ceil(max([xA xB xC]));
+    rangeLength = ceil(max([yA yB yC]));
     
-    domainLength = length(finalOutputA);
-    boundaries = zeros(domainLength, domainLength )
-    for i = 1:domainLength 
+    boundaries = zeros(domainLength, rangeLength )
+    for i = 1:rangeLength
         for j = 1:domainLength
-            (i*domainLength + j)/(domainLength^2) % loading percentage
-            a_val = finalOutputA(i, j);
-            b_val = finalOutputB(i, j);
-            c_val = finalOutputC(i, j);
+            (i*domainLength + j)/(domainLength*rangeLength) % loading percentage
+            id_xA = find(xA == j);
+            id_yA = find(yA == i);
+            
+            id_xB = find(xB == j);
+            id_yB = find(yB == i);
+            
+            id_xC = find(xC == j);
+            id_yC = find(yC == i);
+            
+            if isempty(id_xA ) || isempty(id_yA)
+                a_val = 0;
+            else            
+                a_val = finalOutputA(id_yA, id_xA);
+            end
+            
+            if isempty(id_xB )|| isempty(id_yB)
+                b_val = 0;
+            else            
+                b_val = finalOutputB(id_yB, id_xB);
+            end
+            
+            if isempty(id_xC) || isempty(id_yC)
+                c_val = 0;
+            else            
+                c_val = finalOutputC(id_yC, id_xC);
+            end
+
            if a_val > b_val && a_val > c_val
                boundaries(i, j) = 1;
            elseif b_val > c_val && b_val > a_val
