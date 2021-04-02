@@ -7,10 +7,15 @@ function Parzen2D
 
     var = 400;
     Sigma = [var 0; 0 var];
+    mu = [200 200]
     
-    [finalOutputA, xA, yA] = parzen(al, 0.5, 400);
-    [finalOutputB, xB, yB] = parzen(bl, 0.5, 400);
-    [finalOutputC , xC, yC] = parzen(cl, 0.5, 400);
+    [X1, X2] = meshgrid(1:1:var);
+    win = mvnpdf([X1(:) X2(:)], mu, Sigma)
+    win = reshape(win, length(X2), length(X1))
+    
+    [finalOutputA, xA, yA] = parzen(al, 0.5, win);
+    [finalOutputB, xB, yB] = parzen(bl, 0.5, win);
+    [finalOutputC , xC, yC] = parzen(cl, 0.5, win);
     
 
     figure
@@ -26,10 +31,10 @@ function Parzen2D
     domainLength = ceil(max([xA xB xC]));
     rangeLength = ceil(max([yA yB yC]));
     
-    boundaries = zeros(domainLength, rangeLength )
+    boundaries = zeros(domainLength, rangeLength );
     for i = 1:rangeLength
         for j = 1:domainLength
-            (i*domainLength + j)/(domainLength*rangeLength) % loading percentage
+%             (i*domainLength + j)/(domainLength*rangeLength) % loading percentage
             id_xA = find(xA == j);
             id_yA = find(yA == i);
             
@@ -57,16 +62,38 @@ function Parzen2D
                 c_val = finalOutputC(id_yC, id_xC);
             end
 
-           if a_val > b_val && a_val > c_val
+           if a_val >= b_val && a_val > c_val
                boundaries(i, j) = 1;
-           elseif b_val > c_val && b_val > a_val
+           elseif b_val >= c_val && b_val > a_val
                boundaries(i, j) = 2;
-           elseif c_val > b_val && c_val > a_val
+           elseif c_val > b_val && c_val >= a_val
                boundaries(i, j) = 3;
            end
         end
     end
+    
+    errorA = 0;
+    errorB = 0;
+    errorC = 0;
+    
+    for i = 1:100
+        if boundaries(at(i, 2), at(i, 1)) ~= 1
+            errorA = errorA + 1;
+        end
+        if boundaries(bt(i, 2), bt(i, 1)) ~= 2
+            errorB = errorB + 1;
+         end
+         if boundaries(ct(i, 2), ct(i, 1)) ~= 3
+            errorC = errorC + 1;
+        end
+    end
+    
+    percentA = errorA/100
+    percentB = errorB/100
+    percentC = errorC/100
+    
     figure
     imagesc(boundaries)
+    set(gca,'YDir','normal')
     disp("Done")
 end

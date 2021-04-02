@@ -43,6 +43,29 @@ function MAP3(X1, X2, X3, mu1, mu2, mu3, sigma1, sigma2, sigma3, N1, N2, N3)
             class(i) = 0;
         end
     end
+    
     z = reshape(class,length(x2range),length(x1range));
+%     
+%     errorA = 0;
+%     errorB = 0;
+%     errorC = 0;
+%     
+%     for i = 1:100
+%         if z(X1(2, i), X1(1, i)) ~= 1
+%             errorA = errorA + 1;
+%         end
+%         if z(X2(i, 2), X2(1, i)) ~= 2
+%             errorB = errorB + 1;
+%          end
+%          if z(X3(i, 2), X3(1, 1)) ~= 3
+%             errorC = errorC + 1;
+%         end
+%     end
+    disp("MAP")
+%     percentA = errorA/100
+%     percentB = errorB/100
+%     percentC = errorC/100
+%     
+    
     imagesc(xx1(1,:),xx2(:,1),z)
 end
